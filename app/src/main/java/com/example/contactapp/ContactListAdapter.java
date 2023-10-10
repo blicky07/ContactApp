@@ -1,15 +1,15 @@
 package com.example.contactapp;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.example.contactapp.Contacts;
-import com.example.contactapp.R;
 
 import java.util.List;
 
@@ -43,6 +43,8 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         // Define your item views here
+        private ImageView photoImageView; // Newly added
+
         private TextView nameTextView;
         private TextView phoneTextView;
         private TextView emailTextView;
@@ -51,6 +53,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
             super(itemView);
 
             // Initialize your item views by finding their IDs in the item_contact.xml layout
+            photoImageView = itemView.findViewById(R.id.photoImageView); // Newly added
             nameTextView = itemView.findViewById(R.id.nameTextView);
             phoneTextView = itemView.findViewById(R.id.phoneTextView);
             emailTextView = itemView.findViewById(R.id.emailTextView);
@@ -59,8 +62,17 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
         public void bind(Contacts contact) {
             // Bind the contact data to your item views
             nameTextView.setText(contact.getName());
-            phoneTextView.setText(contact.getPhone());
-            emailTextView.setText(contact.getEmail());
+            phoneTextView.setText("Phone: " + contact.getPhone());
+            emailTextView.setText("Email: " + contact.getEmail());
+
+            // Load the contact's photo into the ImageView
+            if (contact.getPhoto() != null) {
+                Bitmap bitmap = BitmapFactory.decodeByteArray(contact.getPhoto(), 0, contact.getPhoto().length);
+                photoImageView.setImageBitmap(bitmap);
+            } else {
+                // Set a default photo if no photo is available
+                photoImageView.setImageResource(R.drawable.default_contact_photo);
+            }
         }
     }
 }
