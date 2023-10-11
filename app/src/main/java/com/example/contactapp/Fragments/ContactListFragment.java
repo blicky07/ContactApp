@@ -1,4 +1,4 @@
-package com.example.contactapp;
+package com.example.contactapp.Fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,11 +10,18 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.contactapp.Contact.ContactListAdapter;
+import com.example.contactapp.Contact.Contacts;
+import com.example.contactapp.R;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class ContactListFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private ContactListAdapter adapter;
-
+    List<Contacts> contactList = getContactData();
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -25,21 +32,25 @@ public class ContactListFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         // Create an instance of your adapter (ContactListAdapter) and set it to the RecyclerView
-        adapter = new ContactListAdapter();
+        adapter = new ContactListAdapter(contactList);
         recyclerView.setAdapter(adapter);
 
         // Load your contact data into the adapter
         // You need to implement the logic to populate your contact data into the adapter here
+        List<Contacts> contactData = getContactData();
+        adapter.setContacts(contactData);
 
         return view;
     }
 
-    // Add any other methods or logic related to your ContactListFragment here
-}
+    // Example method to fetch contact data (replace with your own implementation)
+    private List<Contacts> getContactData() {
+        List<Contacts> contactData = new ArrayList<>();
+        // Populate the contactData list with contact objects
+        // Example: contactData.add(new Contacts("John Doe", "123-456-7890", "john@example.com"));
+        // Repeat for all contacts you want to display
+        return contactData;
+    }
 
-public void addContactToList(Contacts contact) {
-        // Add the contact to your contactList (the list you use for the RecyclerView)
-        // You need to implement the logic to add the contact to your list here
-        // For example, contactList.add(contact);
-        // Then, update the RecyclerView by calling contactAdapter.notifyDataSetChanged();
-        }
+
+}

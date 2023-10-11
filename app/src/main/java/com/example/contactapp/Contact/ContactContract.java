@@ -1,4 +1,4 @@
-package com.example.contactapp;
+package com.example.contactapp.Contact;
 
 import android.provider.BaseColumns;
 

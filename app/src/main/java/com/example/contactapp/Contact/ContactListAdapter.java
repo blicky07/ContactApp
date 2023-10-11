@@ -1,4 +1,4 @@
-package com.example.contactapp;
+package com.example.contactapp.Contact;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,11 +11,17 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.contactapp.R;
+
 import java.util.List;
 
-public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.ViewHolder> {
+public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.ViewHolder>{
 
     private List<Contacts> contactList;
+
+    public List<Contacts> getContactList() {
+        return contactList;
+    }
 
     public ContactListAdapter(List<Contacts> contactList) {
         this.contactList = contactList;
@@ -41,10 +47,13 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
         return contactList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        // Define your item views here
-        private ImageView photoImageView; // Newly added
+    public void setContacts(List<Contacts> contacts) {
+        this.contactList = contacts;
+        notifyDataSetChanged(); // Notify the adapter that data has changed
+    }
 
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        private ImageView photoImageView;
         private TextView nameTextView;
         private TextView phoneTextView;
         private TextView emailTextView;
@@ -52,26 +61,23 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
         public ViewHolder(View itemView) {
             super(itemView);
 
-            // Initialize your item views by finding their IDs in the item_contact.xml layout
-            photoImageView = itemView.findViewById(R.id.photoImageView); // Newly added
+            photoImageView = itemView.findViewById(R.id.photoImageView);
             nameTextView = itemView.findViewById(R.id.nameTextView);
             phoneTextView = itemView.findViewById(R.id.phoneTextView);
             emailTextView = itemView.findViewById(R.id.emailTextView);
         }
 
         public void bind(Contacts contact) {
-            // Bind the contact data to your item views
             nameTextView.setText(contact.getName());
             phoneTextView.setText("Phone: " + contact.getPhone());
             emailTextView.setText("Email: " + contact.getEmail());
 
-            // Load the contact's photo into the ImageView
             if (contact.getPhoto() != null) {
                 Bitmap bitmap = BitmapFactory.decodeByteArray(contact.getPhoto(), 0, contact.getPhoto().length);
                 photoImageView.setImageBitmap(bitmap);
             } else {
-                // Set a default photo if no photo is available
-                photoImageView.setImageResource(R.drawable.default_contact_photo);
+                // Use a placeholder image if no photo is available
+                photoImageView.setImageResource(R.drawable.ic_launcher_foreground); // Change this to your placeholder image
             }
         }
     }

@@ -1,4 +1,4 @@
-package com.example.contactapp;
+package com.example.contactapp.Contact;
 
 public class Contacts {
     private long id; // Use long for database ID
