@@ -46,6 +46,7 @@ public class ContactListFragment extends Fragment {
     // Example method to fetch contact data (replace with your own implementation)
     private List<Contacts> getContactData() {
         List<Contacts> contactData = new ArrayList<>();
+
         // Populate the contactData list with contact objects
         // Example: contactData.add(new Contacts("John Doe", "123-456-7890", "john@example.com"));
         // Repeat for all contacts you want to display
