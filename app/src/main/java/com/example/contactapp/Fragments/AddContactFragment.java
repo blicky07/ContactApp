@@ -9,6 +9,7 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import android.widget.Toast;
 
 import com.example.contactapp.Contact.Contacts;
 import com.example.contactapp.Database.ContactDatabaseHelper;
@@ -57,7 +58,17 @@ public class AddContactFragment extends Fragment {
         newContact.setEmail(email);
 
         ContactDatabaseHelper db = new ContactDatabaseHelper(getActivity());
-        db.addContact(newContact);
+        long newRowId = db.addContact(newContact);
+
+        if (newRowId != -1) {
+            // Contact added successfully
+            // Show a toast or dialog to inform the user
+            Toast.makeText(getActivity(), "Contact added successfully!", Toast.LENGTH_SHORT).show();
+        } else {
+            // Failed to add contact
+            // Show a toast or dialog to inform the user
+            Toast.makeText(getActivity(), "Failed to add contact", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void goBackToContactList() {
