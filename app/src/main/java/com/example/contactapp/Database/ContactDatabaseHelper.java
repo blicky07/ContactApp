@@ -184,6 +184,24 @@ public class ContactDatabaseHelper extends SQLiteOpenHelper {
 
         return contact;
     }
+    public boolean checkForDuplicate(String name) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(
+                ContactContract.ContactEntry.TABLE_NAME,
+                new String[]{ContactContract.ContactEntry.COLUMN_NAME},
+                ContactContract.ContactEntry.COLUMN_NAME + "=?",
+                new String[]{name},
+                null,
+                null,
+                null,
+                "1"
+        );
+
+        boolean exists = (cursor.getCount() > 0);
+        cursor.close();
+        return exists;
+    }
+
 
 
 

@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -24,10 +25,20 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
         void onContactClick(int position);
     }
 
+    public interface OnImportClickListener {
+        void onImportClick(int position);
+    }
+
     private OnContactClickListener listener;
+    private OnImportClickListener importListener;
 
     public void setOnContactClickListener(OnContactClickListener listener) {
         this.listener = listener;
+
+    }
+
+    public void setOnImportClickListener(OnImportClickListener listener) {
+        this.importListener = listener;
     }
 
     public ContactListAdapter(List<Contacts> contactList) {

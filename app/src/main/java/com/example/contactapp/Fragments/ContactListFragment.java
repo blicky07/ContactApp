@@ -1,14 +1,22 @@
 package com.example.contactapp.Fragments;
 
+import android.content.ContentResolver;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.Manifest;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -28,6 +36,7 @@ public class ContactListFragment extends Fragment implements ContactListAdapter.
     private RecyclerView recyclerView;
     private TextView emptyView;
     private ContactListAdapter adapter;
+    private static final int YOUR_REQUEST_CODE = 1;
 
     @Nullable
     @Override
@@ -39,6 +48,59 @@ public class ContactListFragment extends Fragment implements ContactListAdapter.
         emptyView = view.findViewById(R.id.emptyView);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        // Initialize the Import Button
+        Button importButton = view.findViewById(R.id.importButton);
+        importButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int contactsAdded = 0;  // Initialize a counter for added contacts
+                final int YOUR_REQUEST_CODE = 1;  // Define your request code for permission
+
+                ContactDatabaseHelper db = new ContactDatabaseHelper(getActivity());  // Initialize your database helper
+
+                // Check for permission
+                if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
+                    ContentResolver contentResolver = getActivity().getContentResolver();
+                    Cursor cursor = contentResolver.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+
+                    // Check if the column index is valid
+                    if (cursor != null && cursor.getCount() > 0) {
+                        int nameColumnIndex = cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME);
+
+                        if (nameColumnIndex != -1) {
+                            // Loop through the cursor to read individual contacts
+                            while (cursor.moveToNext()) {
+                                String name = cursor.getString(nameColumnIndex);  // Use the column index directly
+
+                                // Check if the contact already exists in your database
+                                if (!db.checkForDuplicate(name)) {  // Note: You'll need to implement checkForDuplicate in your database helper
+                                    db.addContact(new Contacts(name, "", "", (byte[]) null));  // Add the new contact
+                                    contactsAdded++;  // Increment the counter
+                                }
+                            }
+                        } else {
+                            Toast.makeText(getActivity(), "Failed to read contacts. Name column not found.", Toast.LENGTH_LONG).show();
+                        }
+                        cursor.close();
+                    }
+                } else {
+                    // Request permission
+                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_CONTACTS}, YOUR_REQUEST_CODE);
+                }
+
+                // Refresh the contact list
+                refreshContactList();
+
+                // Show a Toast or dialog based on the value of contactsAdded
+                if (contactsAdded > 0) {
+                    Toast.makeText(getActivity(), contactsAdded + " contacts were added.", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getActivity(), "No new contacts were added.", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
 
         // Initialize the Add New Contact Button
         Button addNewContactButton = view.findViewById(R.id.addNewContactButton);
@@ -74,6 +136,49 @@ public class ContactListFragment extends Fragment implements ContactListAdapter.
 
         return view;
     }
+
+    private void refreshContactList() {
+        // Reload the contact list from the database
+        ContactDatabaseHelper db = new ContactDatabaseHelper(getActivity());
+        List<Contacts> newContactList = db.getAllContacts();
+
+        // Update the adapter with the new list
+        adapter.setContacts(newContactList);
+
+        // Notify the RecyclerView that the data set has changed
+        adapter.notifyDataSetChanged();
+    }
+
+    private void importContacts() {
+        ContactDatabaseHelper db = new ContactDatabaseHelper(getActivity());
+        ContentResolver contentResolver = getActivity().getContentResolver();
+        Cursor cursor = contentResolver.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+
+        if (cursor != null && cursor.getCount() > 0) {
+            // Loop through the cursor to read individual contact
+            while (cursor.moveToNext()) {
+                int idIndex = cursor.getColumnIndex(ContactsContract.Contacts._ID);
+                int nameIndex = cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME);
+
+                if (idIndex != -1 && nameIndex != -1) {
+                    String contactId = cursor.getString(idIndex);
+                    String name = cursor.getString(nameIndex);
+
+                    // Use checkForDuplicate() to avoid adding duplicates
+                    if (!db.checkForDuplicate(name)) {
+                        db.addContact(new Contacts(name, "", "", (byte[]) null));  // Add the new contact
+                    }
+                }
+            }
+            cursor.close();
+
+            // Update the RecyclerView with the new data
+            List<Contacts> contactList = db.getAllContacts();
+            adapter.setContacts(contactList);
+            adapter.notifyDataSetChanged();
+        }
+    }
+
 
     // What happens if you click on any of the contacts
     @Override

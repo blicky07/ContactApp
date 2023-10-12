@@ -28,6 +28,14 @@ public class Contacts {
         this.photo = contact.photo;
     }
 
+    public Contacts(String name, String phone, String email, byte[] photo) {
+        this.name = name;
+        this.phone = phone;
+        this.email = email;
+        this.photo = photo;
+    }
+
+
     // Getters
     public long getId() {
         return id;
