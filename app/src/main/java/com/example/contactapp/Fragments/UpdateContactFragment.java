@@ -1,25 +1,69 @@
 package com.example.contactapp.Fragments;
 
+import android.Manifest;
+import android.app.Activity;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import java.io.ByteArrayOutputStream;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 
 import com.example.contactapp.Contact.Contacts;
 import com.example.contactapp.Database.ContactDatabaseHelper;
 import com.example.contactapp.R;
-
 public class UpdateContactFragment extends Fragment {
 
     private EditText nameEditText, phoneEditText, emailEditText;
     private String contactName;
+    private ImageView profileImageView;
+    private byte[] profileImage;
+    private ActivityResultLauncher<Intent> mGetContent;
+    private ActivityResultLauncher<String> requestPermissionLauncher;
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        mGetContent = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Intent data = result.getData();
+                        Bundle extras = data.getExtras();
+                        Bitmap imageBitmap = (Bitmap) extras.get("data");
+                        profileImageView.setImageBitmap(imageBitmap);
+
+                        // Convert the image to a byte array
+                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                        imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                        profileImage = stream.toByteArray();
+                    }
+                }
+        );
+
+        requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+            if (isGranted) {
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                mGetContent.launch(takePictureIntent);
+            } else {
+                Toast.makeText(getActivity(), "Camera permission is required to capture image", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
     @Nullable
     @Override
@@ -69,6 +113,21 @@ public class UpdateContactFragment extends Fragment {
             }
         });
 
+        profileImageView = view.findViewById(R.id.profileImageView);  // Add this ImageView to your layout
+        profileImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (ContextCompat.checkSelfPermission(
+                        getContext(), Manifest.permission.CAMERA) ==
+                        PackageManager.PERMISSION_GRANTED) {
+                    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    mGetContent.launch(takePictureIntent);
+                } else {
+                    requestPermissionLauncher.launch(Manifest.permission.CAMERA);
+                }
+            }
+        });
+
         return view;
     }
 
@@ -89,6 +148,8 @@ public class UpdateContactFragment extends Fragment {
                 updatedContact.setName(name);
                 updatedContact.setPhone(phone);
                 updatedContact.setEmail(email);
+
+                updatedContact.setPhoto(profileImage);
 
                 int rowsAffected = db.updateContact(updatedContact); // Implement this method in your database helper
 
