@@ -10,6 +10,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.example.contactapp.Contact.ContactContract;
 import com.example.contactapp.Contact.Contacts;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ContactDatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "ContactManager.db";
@@ -58,5 +61,50 @@ public class ContactDatabaseHelper extends SQLiteOpenHelper {
         }
         return newRowId;
     }
+
+    public List<Contacts> getAllContacts() {
+        List<Contacts> contactsList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Define a projection that specifies which columns from the database
+        // you will actually use after this query.
+        String[] projection = {
+                ContactContract.ContactEntry._ID,
+                ContactContract.ContactEntry.COLUMN_NAME,
+                ContactContract.ContactEntry.COLUMN_PHONE,
+                ContactContract.ContactEntry.COLUMN_EMAIL,
+                ContactContract.ContactEntry.COLUMN_PHOTO
+        };
+
+        Cursor cursor = db.query(
+                ContactContract.ContactEntry.TABLE_NAME,   // The table to query
+                projection,             // The array of columns to return (pass null to get all)
+                null,          // The columns for the WHERE clause
+                null,       // The values for the WHERE clause
+                null,          // Don't group the rows
+                null,           // Don't filter by row groups
+                null            // The sort order
+        );
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                Contacts contact = new Contacts();
+                contact.setId(cursor.getInt(cursor.getColumnIndexOrThrow(ContactContract.ContactEntry._ID)));
+                contact.setName(cursor.getString(cursor.getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME)));
+                contact.setPhone(cursor.getString(cursor.getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_PHONE)));
+                contact.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_EMAIL)));
+                byte[] photo = cursor.getBlob(cursor.getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_PHOTO));
+                contact.setPhoto(photo);
+                contactsList.add(contact);
+            } while (cursor.moveToNext());
+        }
+
+        if (cursor != null) {
+            cursor.close();
+        }
+        db.close();
+        return contactsList;
+    }
+
     // Other CRUD methods (e.g., update, delete, etc.)
 }

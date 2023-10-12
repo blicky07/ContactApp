@@ -14,8 +14,10 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.contactapp.Contact.ContactContract;
 import com.example.contactapp.Contact.ContactListAdapter;
 import com.example.contactapp.Contact.Contacts;
+import com.example.contactapp.Database.ContactDatabaseHelper;
 import com.example.contactapp.R;
 
 import java.util.ArrayList;
@@ -26,7 +28,6 @@ public class ContactListFragment extends Fragment {
     private RecyclerView recyclerView;
     private TextView emptyView;
     private ContactListAdapter adapter;
-    List<Contacts> contactList = getContactData();
 
     @Nullable
     @Override
@@ -52,11 +53,13 @@ public class ContactListFragment extends Fragment {
         });
 
         // Create an instance of your adapter (ContactListAdapter) and set it to the RecyclerView
+        ContactDatabaseHelper db = new ContactDatabaseHelper(getActivity());
+        List<Contacts> contactList = db.getAllContacts();
         adapter = new ContactListAdapter(contactList);
         recyclerView.setAdapter(adapter);
 
         // Load your contact data into the adapter
-        List<Contacts> contactData = getContactData();
+        List<Contacts> contactData = db.getAllContacts();
         adapter.setContacts(contactData);
 
         // Toggle visibility based on whether the list is empty or not
@@ -71,12 +74,4 @@ public class ContactListFragment extends Fragment {
         return view;
     }
 
-    // Example method to fetch contact data (replace with your own implementation)
-    private List<Contacts> getContactData() {
-        List<Contacts> contactData = new ArrayList<>();
-        // Populate the contactData list with contact objects
-        // Example: contactData.add(new Contacts("John Doe", "123-456-7890", "john@example.com"));
-        // Repeat for all contacts you want to display
-        return contactData;
-    }
 }
