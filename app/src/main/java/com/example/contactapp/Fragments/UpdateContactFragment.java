@@ -33,11 +33,34 @@ public class UpdateContactFragment extends Fragment {
     private byte[] profileImage;
     private ActivityResultLauncher<Intent> mGetContent;
     private ActivityResultLauncher<String> requestPermissionLauncher;
+    private ActivityResultLauncher<Intent> mGetGalleryContent;  // New ActivityResultLauncher for gallery
 
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Register for gallery intent
+        mGetGalleryContent = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Intent data = result.getData();
+                        if (data != null) {
+                            try {
+                                Bitmap imageBitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), data.getData());
+                                profileImageView.setImageBitmap(imageBitmap);
+
+                                // Convert the image to a byte array
+                                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                                imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                                profileImage = stream.toByteArray();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+        );
 
         mGetContent = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -87,7 +110,16 @@ public class UpdateContactFragment extends Fragment {
             }
         }
 
-
+        // Button to launch gallery
+        Button galleryButton = view.findViewById(R.id.updateContactGalleryButton);  // This ID should match the one in your layout
+        galleryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_PICK);
+                intent.setType("image/*");
+                mGetGalleryContent.launch(intent);
+            }
+        });
 
         Button saveButton = view.findViewById(R.id.saveButton);
         saveButton.setOnClickListener(new View.OnClickListener() {
