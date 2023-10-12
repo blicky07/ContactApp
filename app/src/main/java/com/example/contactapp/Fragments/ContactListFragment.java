@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -36,6 +37,19 @@ public class ContactListFragment extends Fragment {
         emptyView = view.findViewById(R.id.emptyView);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        // Initialize the Add New Contact Button
+        Button addNewContactButton = view.findViewById(R.id.addNewContactButton);
+        addNewContactButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Here you can launch another fragment or activity to add a new contact
+                // For example:
+                // getActivity().getSupportFragmentManager().beginTransaction()
+                //       .replace(R.id.frameLayout2, new ContactCreateFragment())
+                //       .commit();
+            }
+        });
 
         // Create an instance of your adapter (ContactListAdapter) and set it to the RecyclerView
         adapter = new ContactListAdapter(contactList);
