@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
@@ -96,17 +97,27 @@ public class UpdateContactFragment extends Fragment {
         nameEditText = view.findViewById(R.id.nameEditText);
         phoneEditText = view.findViewById(R.id.phoneEditText);
         emailEditText = view.findViewById(R.id.emailEditText);
+        profileImageView = view.findViewById(R.id.profileImageView);  // Initialize this before setting the image
 
         // Fetch and display the contact details
         Bundle bundle = getArguments();
         if (bundle != null) {
-            contactName = bundle.getString("contactName");  // Get the name passed from the previous fragment
+            contactName = bundle.getString("contactName");
             ContactDatabaseHelper db = new ContactDatabaseHelper(getActivity());
-            Contacts contact = db.getContactByName(contactName);  // Assuming you've implemented this method
+            Contacts contact = db.getContactByName(contactName);
             if (contact != null) {
                 nameEditText.setText(contact.getName());
                 phoneEditText.setText(contact.getPhone());
                 emailEditText.setText(contact.getEmail());
+
+                // Retrieve the photo
+                profileImage = contact.getPhoto();
+
+                // Convert byte array back to Bitmap
+                if (profileImage != null) {
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(profileImage, 0, profileImage.length);
+                    profileImageView.setImageBitmap(bitmap);  // Set the image to ImageView
+                }
             }
         }
 
@@ -144,6 +155,8 @@ public class UpdateContactFragment extends Fragment {
                 goBackToContactList();
             }
         });
+
+
 
         profileImageView = view.findViewById(R.id.profileImageView);  // Add this ImageView to your layout
         profileImageView.setOnClickListener(new View.OnClickListener() {
