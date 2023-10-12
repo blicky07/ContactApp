@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -20,6 +22,7 @@ import java.util.List;
 public class ContactListFragment extends Fragment {
 
     private RecyclerView recyclerView;
+    private TextView emptyView;
     private ContactListAdapter adapter;
     List<Contacts> contactList = getContactData();
 
@@ -28,8 +31,10 @@ public class ContactListFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_contact_list, container, false);
 
-        // Initialize RecyclerView
+        // Initialize RecyclerView and EmptyView
         recyclerView = view.findViewById(R.id.recyclerView);
+        emptyView = view.findViewById(R.id.emptyView);
+
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         // Create an instance of your adapter (ContactListAdapter) and set it to the RecyclerView
@@ -39,6 +44,15 @@ public class ContactListFragment extends Fragment {
         // Load your contact data into the adapter
         List<Contacts> contactData = getContactData();
         adapter.setContacts(contactData);
+
+        // Toggle visibility based on whether the list is empty or not
+        if (contactList.isEmpty()) {
+            recyclerView.setVisibility(View.GONE);
+            emptyView.setVisibility(View.VISIBLE);
+        } else {
+            recyclerView.setVisibility(View.VISIBLE);
+            emptyView.setVisibility(View.GONE);
+        }
 
         return view;
     }
