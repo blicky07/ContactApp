@@ -19,6 +19,16 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
 
     private List<Contacts> contactList;
 
+    public interface OnContactClickListener {
+        void onContactClick(int position);
+    }
+
+    private OnContactClickListener listener;
+
+    public void setOnContactClickListener(OnContactClickListener listener) {
+        this.listener = listener;
+    }
+
     public ContactListAdapter(List<Contacts> contactList) {
         this.contactList = contactList;
     }
@@ -54,6 +64,18 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
 
         public ViewHolder(View itemView) {
             super(itemView);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (listener != null) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            listener.onContactClick(position);
+                        }
+                    }
+                }
+            });
 
             photoImageView = itemView.findViewById(R.id.photoImageView);
             nameTextView = itemView.findViewById(R.id.nameTextView);

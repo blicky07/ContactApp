@@ -23,7 +23,7 @@ import com.example.contactapp.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ContactListFragment extends Fragment {
+public class ContactListFragment extends Fragment implements ContactListAdapter.OnContactClickListener {
 
     private RecyclerView recyclerView;
     private TextView emptyView;
@@ -56,6 +56,7 @@ public class ContactListFragment extends Fragment {
         ContactDatabaseHelper db = new ContactDatabaseHelper(getActivity());
         List<Contacts> contactList = db.getAllContacts();
         adapter = new ContactListAdapter(contactList);
+        adapter.setOnContactClickListener(this);
         recyclerView.setAdapter(adapter);
 
         // Load your contact data into the adapter
@@ -74,4 +75,11 @@ public class ContactListFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onContactClick(int position) {
+        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, new AddContactFragment());
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
 }
