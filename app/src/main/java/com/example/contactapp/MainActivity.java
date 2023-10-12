@@ -5,6 +5,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Bundle;
 
+import com.example.contactapp.Fragments.AddContactFragment;
 import com.example.contactapp.Fragments.ContactListFragment;
 
 public class MainActivity extends AppCompatActivity {

@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -43,11 +44,10 @@ public class ContactListFragment extends Fragment {
         addNewContactButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Here you can launch another fragment or activity to add a new contact
-                // For example:
-                // getActivity().getSupportFragmentManager().beginTransaction()
-                //       .replace(R.id.frameLayout2, new ContactCreateFragment())
-                //       .commit();
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_container, new AddContactFragment());
+                transaction.addToBackStack(null);
+                transaction.commit();
             }
         });
 
