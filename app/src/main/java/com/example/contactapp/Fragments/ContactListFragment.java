@@ -75,11 +75,26 @@ public class ContactListFragment extends Fragment implements ContactListAdapter.
         return view;
     }
 
+    // What happens if you click on any of the contacts
     @Override
     public void onContactClick(int position) {
+        // Fetch the clicked contact based on position
+        Contacts clickedContact = adapter.getContactAtPosition(position);
+        String contactName = clickedContact.getName();
+
+        // Create a Bundle and put the name of the clicked contact into it
+        Bundle bundle = new Bundle();
+        bundle.putString("contactName", contactName);
+
+        // Create an instance of UpdateContactFragment and set its arguments
+        UpdateContactFragment updateContactFragment = new UpdateContactFragment();
+        updateContactFragment.setArguments(bundle);
+
+        // Navigate to UpdateContactFragment
         FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, new AddContactFragment());
+        transaction.replace(R.id.fragment_container, updateContactFragment);
         transaction.addToBackStack(null);
         transaction.commit();
     }
+
 }

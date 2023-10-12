@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.contactapp.Database.ContactDatabaseHelper;
 import com.example.contactapp.R;
 
 import java.util.List;
@@ -96,4 +97,10 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
             }
         }
     }
+
+    public Contacts getContactAtPosition(int position) {
+        return contactList.get(position);
+    }
+
+
 }

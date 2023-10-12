@@ -106,5 +106,87 @@ public class ContactDatabaseHelper extends SQLiteOpenHelper {
         return contactsList;
     }
 
+    public int updateContact(Contacts contact) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(ContactContract.ContactEntry.COLUMN_NAME, contact.getName());
+        values.put(ContactContract.ContactEntry.COLUMN_PHONE, contact.getPhone());
+        values.put(ContactContract.ContactEntry.COLUMN_EMAIL, contact.getEmail());
+        values.put(ContactContract.ContactEntry.COLUMN_PHOTO, contact.getPhoto());
+
+        // Update the row and get the number of rows affected
+        int rowsAffected = db.update(
+                ContactContract.ContactEntry.TABLE_NAME,
+                values,
+                ContactContract.ContactEntry._ID + " = ?",
+                new String[]{String.valueOf(contact.getId())}
+        );
+
+        db.close();
+        return rowsAffected;
+    }
+
+    public long deleteContact(long id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Delete the row and get the number of rows affected
+        long rowsDeleted = db.delete(
+                ContactContract.ContactEntry.TABLE_NAME,
+                ContactContract.ContactEntry._ID + " = ?",
+                new String[]{String.valueOf(id)}
+        );
+
+        db.close();
+
+        return rowsDeleted;
+    }
+
+    public Contacts getContactByName(String name) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Define a projection that specifies which columns from the database you will actually use after this query.
+        String[] projection = {
+                ContactContract.ContactEntry._ID,
+                ContactContract.ContactEntry.COLUMN_NAME,
+                ContactContract.ContactEntry.COLUMN_PHONE,
+                ContactContract.ContactEntry.COLUMN_EMAIL,
+                ContactContract.ContactEntry.COLUMN_PHOTO
+        };
+
+        // Query to fetch the contact with the given name
+        Cursor cursor = db.query(
+                ContactContract.ContactEntry.TABLE_NAME,
+                projection,
+                ContactContract.ContactEntry.COLUMN_NAME + " = ?",
+                new String[]{name},
+                null,
+                null,
+                null,
+                "1"  // Limit to 1 result
+        );
+
+        Contacts contact = null;
+        if (cursor != null && cursor.moveToFirst()) {
+            contact = new Contacts();
+            contact.setId(cursor.getInt(cursor.getColumnIndexOrThrow(ContactContract.ContactEntry._ID)));
+            contact.setName(cursor.getString(cursor.getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME)));
+            contact.setPhone(cursor.getString(cursor.getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_PHONE)));
+            contact.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_EMAIL)));
+            byte[] photo = cursor.getBlob(cursor.getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_PHOTO));
+            contact.setPhoto(photo);
+        }
+
+        if (cursor != null) {
+            cursor.close();
+        }
+        db.close();
+
+        return contact;
+    }
+
+
+
+
     // Other CRUD methods (e.g., update, delete, etc.)
 }

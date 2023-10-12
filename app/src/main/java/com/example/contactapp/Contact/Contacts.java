@@ -20,6 +20,14 @@ public class Contacts {
         this.photo = photo;
     }
 
+    public Contacts(Contacts contact) {
+        this.id = contact.id;
+        this.name = contact.name;
+        this.phone = contact.phone;
+        this.email = contact.email;
+        this.photo = contact.photo;
+    }
+
     // Getters
     public long getId() {
         return id;
