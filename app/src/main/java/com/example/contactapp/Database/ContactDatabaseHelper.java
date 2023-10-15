@@ -202,9 +202,4 @@ public class ContactDatabaseHelper extends SQLiteOpenHelper {
         return exists;
     }
 
-
-
-
-
-    // Other CRUD methods (e.g., update, delete, etc.)
 }

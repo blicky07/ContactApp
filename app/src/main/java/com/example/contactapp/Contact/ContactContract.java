@@ -4,7 +4,7 @@ import android.provider.BaseColumns;
 
 public final class ContactContract {
     // To prevent someone from accidentally instantiating the contract class,
-    // give it an empty constructor.
+    // We have an empty constructor
     private ContactContract() {
     }
 
